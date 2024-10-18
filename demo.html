@@ -21,16 +21,50 @@
 				<div id="m-line" class="m-line"></div>
 				<div id="k-content" class="K-line"></div> 
 		</div> 
-		<script src="js/jquery-3.3.1.min.js"></script> 
-		<script src="js/echarts.min.js" type="text/javascript" charset="utf-8"></script>   
+		<script src="js/jquery-3.3.1.min.js"></script>
+		<script src="js/echarts.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/tmpData.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/k-line.js" type="text/javascript" charset="utf-8"></script>
-		<script>   
-				var mChart = echarts.init(document.getElementById('m-line'));
-				mChart.setOption(initMOption(mdata,'us'));
-				
-				var kChart = echarts.init(document.getElementById('k-content')); 
-				kChart.setOption(initKOption(kdata)); 
+		<script>
+			var mdata = {};
+			$.ajax({
+				url: '你的服务器接口URL', // 替换为你的接口URL
+				type: 'GET', // 或者 'POST', 取决于你的接口要求
+				data: {gid: id, date: date},
+				dataType: 'json', // 假设你期望的数据类型是JSON
+				success: function(data) {
+					// 如果你想赋值给一个变量
+					mdata = data;
+					// 在这里你可以使用 'myData' 变量
+				},
+				error: function(xhr, status, error) {
+					// 请求失败后的回调函数
+					console.error("An error occurred: " + status + "\nError: " + error);
+				}
+			});
+
+			var kdata = [];
+
+			$.ajax({
+				url: '你的服务器接口URL', // 替换为你的接口URL
+				type: 'GET', // 或者 'POST', 取决于你的接口要求
+				data: {gid: id, date: date},
+				dataType: 'json', // 假设你期望的数据类型是JSON
+				success: function(data) {
+					// 如果你想赋值给一个变量
+					kdata = data;
+				},
+				error: function(xhr, status, error) {
+					// 请求失败后的回调函数
+					console.error("An error occurred: " + status + "\nError: " + error);
+				}
+			});
+
+			var mChart = echarts.init(document.getElementById('m-line'));
+			mChart.setOption(initMOption(mdata,'us'));
+
+			var kChart = echarts.init(document.getElementById('k-content'));
+			kChart.setOption(initKOption(kdata));
 		</script>
 	</body>
 </html>
