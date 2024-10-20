@@ -26,16 +26,48 @@
 		<script src="js/tmpData.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/k-line.js" type="text/javascript" charset="utf-8"></script>
 		<script>
-			var mdata = {};
+			let gid = '0.123115';
+			let date = '2024-10-18';
+			let period = 60;
+			function getURLParameter(name) {
+				name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+				var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+						results = regex.exec(location.search);
+				return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+			}
+
+			let gidI = getURLParameter('gid');
+			let dateI = getURLParameter('date');
+			let periodI = getURLParameter('period')
+			if (gidI !== '') {
+				gid = gidI
+			}
+			if (dateI !== '') {
+				date = dateI
+			}
+			if (periodI !== '') {
+				period = periodI
+			}
+
 			$.ajax({
-				url: '你的服务器接口URL', // 替换为你的接口URL
+				url: "/api/trends", // 替换为你的接口URL
 				type: 'GET', // 或者 'POST', 取决于你的接口要求
-				data: {gid: id, date: date},
+				data: {gid: gid, date: date, period: period},
 				dataType: 'json', // 假设你期望的数据类型是JSON
 				success: function(data) {
 					// 如果你想赋值给一个变量
-					mdata = data;
-					// 在这里你可以使用 'myData' 变量
+					console.log(data.code)
+					if (data.code !== 0) {
+						console.log(data.msg)
+						return
+					}
+
+					var mChart = echarts.init(document.getElementById('m-line'));
+					mChart.setOption(initMOption(data.data));
+
+					var kChart = echarts.init(document.getElementById('k-content'));
+					console.log(data.data.percent)
+					kChart.setOption(initKOption(data.data.kline, data.data.percent));
 				},
 				error: function(xhr, status, error) {
 					// 请求失败后的回调函数
@@ -43,28 +75,22 @@
 				}
 			});
 
-			var kdata = [];
-
-			$.ajax({
-				url: '你的服务器接口URL', // 替换为你的接口URL
-				type: 'GET', // 或者 'POST', 取决于你的接口要求
-				data: {gid: id, date: date},
-				dataType: 'json', // 假设你期望的数据类型是JSON
-				success: function(data) {
-					// 如果你想赋值给一个变量
-					kdata = data;
-				},
-				error: function(xhr, status, error) {
-					// 请求失败后的回调函数
-					console.error("An error occurred: " + status + "\nError: " + error);
-				}
-			});
-
-			var mChart = echarts.init(document.getElementById('m-line'));
-			mChart.setOption(initMOption(mdata,'us'));
-
-			var kChart = echarts.init(document.getElementById('k-content'));
-			kChart.setOption(initKOption(kdata));
+			// var kdataAPI = [];
+			//
+			// $.ajax({
+			// 	url: '/api/trends', // 替换为你的接口URL
+			// 	type: 'GET', // 或者 'POST', 取决于你的接口要求
+			// 	data: {gid: gid},
+			// 	dataType: 'json', // 假设你期望的数据类型是JSON
+			// 	success: function(data) {
+			// 		// 如果你想赋值给一个变量
+			// 		kdataAPI = data;
+			// 	},
+			// 	error: function(xhr, status, error) {
+			// 		// 请求失败后的回调函数
+			// 		console.error("An error occurred: " + status + "\nError: " + error);
+			// 	}
+			// });
 		</script>
 	</body>
 </html>

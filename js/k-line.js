@@ -51,38 +51,40 @@ function getNextTime(startTime, endTIme, offset, resultArr) {
  * 不同类型的股票的交易时间会不同  
  * @param {Object} type   hs=沪深  us=美股  hk=港股
  */
-var time_arr = function(type) { 
-	if(type.indexOf('us')!=-1){//生成美股时间段
-		var timeArr = new Array();
-		timeArr.push('09:30')
-		return getNextTime('09:30', '16:00', 1, timeArr);
-	}
-	if(type.indexOf('hs')!=-1){//生成沪深时间段
-		var timeArr = new Array();
-			timeArr.push('09:30');
-			timeArr.concat(getNextTime('09:30', '11:29', 1, timeArr)); 
-			timeArr.push('13:00');
-			timeArr.concat(getNextTime('13:00', '15:00', 1, timeArr)); 
-		return timeArr;
-	}
-	if(type.indexOf('hk')!=-1){//生成港股时间段
-		var timeArr = new Array();
-			timeArr.push('09:30');
-			timeArr.concat(getNextTime('09:30', '11:59', 1, timeArr)); 
-			timeArr.push('13:00');
-			timeArr.concat(getNextTime('13:00', '16:00', 1, timeArr)); 
-		return timeArr;
-	}
-	
-}
+// var time_arr = function(type) {
+// 	if(type.indexOf('us')!=-1){//生成美股时间段
+// 		var timeArr = new Array();
+// 		timeArr.push('09:30')
+// 		return getNextTime('09:30', '16:00', 1, timeArr);
+// 	}
+// 	if(type.indexOf('hs')!=-1){//生成沪深时间段
+// 		var timeArr = new Array();
+// 			timeArr.push('09:30');
+// 			timeArr.concat(getNextTime('09:30', '11:29', 1, timeArr));
+// 			timeArr.push('13:00');
+// 			timeArr.concat(getNextTime('13:00', '15:00', 1, timeArr));
+// 		return timeArr;
+// 	}
+// 	if(type.indexOf('hk')!=-1){//生成港股时间段
+// 		var timeArr = new Array();
+// 			timeArr.push('09:30');
+// 			timeArr.concat(getNextTime('09:30', '11:59', 1, timeArr));
+// 			timeArr.push('13:00');
+// 			timeArr.concat(getNextTime('13:00', '16:00', 1, timeArr));
+// 		return timeArr;
+// 	}
+//
+// }
 
 
-var get_m_data = function(m_data,type) {
+var get_m_data = function(m_data) {
 	var priceArr = new Array();
 	var avgPrice = new Array();
 	var vol = new Array();
-	var times = time_arr(type); 
+	var times = new Array();
+	// var times = time_arr(type);
 	$.each(m_data.data, function(i, v) {
+		times.push(v[0])
 		priceArr.push(v[1]);
 		avgPrice.push(v[2]);
 		vol.push(v[3]); 
@@ -104,8 +106,8 @@ var get_m_data = function(m_data,type) {
  * @param {Object} m_data 分时数据
  * @param {Object} type 股票类型  us-美股  hs-沪深  hk-港股
  */
-function initMOption(m_data,type){
-	var m_datas = get_m_data(m_data,type); 
+function initMOption(m_data){
+	var m_datas = get_m_data(m_data);
 	return {
 		tooltip: { //弹框指示器
 			trigger: 'axis',
@@ -485,7 +487,7 @@ calcMACD=function(short,long,mid,data,field){
  //=================================================MADC计算公式 end
 
 
-function initKOption(cdata){
+function initKOption(cdata, percent){
 	var data = splitData(cdata);
 	var macd=calcMACD(12,26,9,data.datas,1);  
 	return {
@@ -736,6 +738,18 @@ function initKOption(cdata){
 								}
 								return colorList;
 							},
+						}
+					}
+				}, {
+					name: 'Percent',
+					type: 'line',
+					xAxisIndex: 1,
+					yAxisIndex: 1,
+					data: percent,
+					barWidth: '60%',
+					itemStyle: {
+						normal: {
+							color: '#FFFFFF',
 						}
 					}
 				}, {
