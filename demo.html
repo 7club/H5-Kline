@@ -13,8 +13,8 @@
 		position: fixed;width: 100%;
 		bottom: 0rem;top: 0; 
 	}
-	.Kline-div .m-line{height: 49%;width: 100%;margin-bottom: 1%;} 
-	.Kline-div .K-line{height: 50%;width: 100%;}   
+	.Kline-div .m-line{height: 19%;width: 100%;margin-bottom: 1%;}
+	.Kline-div .K-line{height: 80%;width: 100%;}
 </style>  
 	<body> 
 		<div id="Kline-div" class="Kline-div">  
@@ -50,7 +50,7 @@
 			}
 
 			$.ajax({
-				url: "/api/trends", // 替换为你的接口URL
+				url: "/api/trendswithpre", // 替换为你的接口URL
 				type: 'GET', // 或者 'POST', 取决于你的接口要求
 				data: {gid: gid, date: date, period: period},
 				dataType: 'json', // 假设你期望的数据类型是JSON

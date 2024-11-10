@@ -406,7 +406,7 @@ function calculateMA(dayCount,data) {
 
 //=================================================MADC计算公式
 
-var calcEMA,calcDIF,calcDEA,calcMACD;
+var calcEMA,calcSMA,calcSTD,calcDIF,calcDEA,calcMACD,calcRSI,calcOBV,calcMAOBV,calcKDJ,calcBOLL,calcWR;
 
 /*
  * 计算EMA指数平滑移动平均线，用于MACD
@@ -432,6 +432,171 @@ calcEMA=function(n,data,field){
     } 
     return ema;
 };
+
+/**
+ * 计算SMA简单移动平均线
+ * @param {number} n 时间窗口
+ * @param {array} data 输入数据
+ * @param {string} [field] 计算字段配置，可选，用于二维数组
+ * @return {array} SMA数组
+ */
+calcSMA = function (n, data, field) {
+	var i, l, sma, sum;
+	var result = [];
+
+	if (field) {
+		// 二维数组处理
+		for (i = 0, l = data.length; i < l; i++) {
+			if (i < n - 1) {
+				result.push(null); // 数据不足n个时，SMA为null
+				continue;
+			}
+			sum = 0;
+			for (var j = i - n + 1; j <= i; j++) {
+				sum += parseFloat(data[j][field]);
+			}
+			sma = sum / n;
+			result.push(sma.toFixed(2)); // 保留两位小数
+		}
+	} else {
+		// 一维数组处理
+		for (i = 0, l = data.length; i < l; i++) {
+			if (i < n - 1) {
+				result.push(null); // 数据不足n个时，SMA为null
+				continue;
+			}
+			sum = 0;
+			for (var j = i - n + 1; j <= i; j++) {
+				sum += parseFloat(data[j]);
+			}
+			sma = sum / n;
+			result.push(sma.toFixed(3)); // 保留三位小数
+		}
+	}
+
+	return result;
+}
+
+/**
+ * 计算标准差
+ * @param {number[]} data 输入数据
+ * @param {number} n 时间窗口
+ * @return {number} 标准差
+ */
+calcSTD = function (data, n) {
+	if (data.length < n) {
+		throw new Error('数据不足n个');
+	}
+
+	var mean = 0;
+	for (var i = 0; i < data.length; i++) {
+		mean += data[i];
+	}
+	mean /= n;
+
+	var sum = 0;
+	for (var i = 0; i < data.length; i++) {
+		sum += Math.pow(data[i] - mean, 2);
+	}
+	var std = Math.sqrt(sum / n);
+
+	return std;
+}
+
+/**
+ * 计算Bollinger Bands
+ * @param {number[]} data 输入数据
+ * @param {number} n 时间窗口
+ * @param {number} k 标准偏差系数，默认为2
+ * @return {array} Bollinger Bands数组，包含三部分：移动平均线、上界、下界
+ */
+calcBOLL = function (data, n, k = 2) {
+	if (data.length < n) {
+		throw new Error('数据不足n个');
+	}
+
+	var ma = [];
+	var upper = [];
+	var lower = [];
+
+	// 计算移动平均线
+	ma = calcSMA(n, data);
+
+	// 计算标准偏差
+	var std = calcSTD(data.slice(n - 1), n);
+
+	// 计算BOLL的上界和下界
+	for (var i = 0; i < data.length; i++) {
+		upper.push(ma[i] + k * std);
+		lower.push(ma[i] - k * std);
+	}
+
+	return [ma, upper, lower];
+}
+
+/**
+ * 计算RSI相对强弱指数
+ * @param {number} n 时间窗口
+ * @param {array} data 输入数据，应为包含价格（如收盘价）的一维数组
+ */
+calcRSI = function(n, data) {
+	var i, l, avgGain, avgLoss, rs, rsi;
+	var gains = []; // 存储上涨幅度
+	var losses = []; // 存储下跌幅度
+	var delta; // 当前价格与前一天价格的差
+
+	// 初始化gains和losses数组，并计算每个时间点的上涨或下跌幅度
+	for (i = 1, l = data.length; i < l; i++) {
+		delta = data[i] - data[i - 1];
+		if (delta > 0) {
+			gains.push(delta);
+			losses.push(0);
+		} else {
+			gains.push(0);
+			losses.push(-delta);
+		}
+	}
+
+	// 使用EMA函数计算平均上涨幅度和平均下跌幅度
+	avgGain = calcEMA(n, gains)[n - 1]; // 取EMA数组的第n个元素作为平均上涨幅度
+	avgLoss = calcEMA(n, losses)[n - 1]; // 取EMA数组的第n个元素作为平均下跌幅度
+
+	// 避免除以0的情况
+	if (avgLoss === 0) {
+		return 100; // 如果平均下跌幅度为0，则RSI为100
+	}
+
+	// 计算RS（相对强度）和RSI（相对强弱指数）
+	rs = avgGain / avgLoss;
+	rsi = 100 - (100 / (1 + rs));
+
+	return rsi.toFixed(2); // 返回保留两位小数的RSI值
+};
+
+// 假设data是一个包含价格和交易量的二维数组，例如：[[price1, volume1], [price2, volume2], ...]
+calcOBV = function (data) {
+	var obv = [0]; // 初始化OBV数组，第一个值为0
+	var previousPrice = data[0][0]; // 记录上一个价格
+
+	for (var i = 1; i < data.length; i++) {
+		var currentPrice = data[i][0];
+		var volume = data[i][1];
+		var sign = currentPrice > previousPrice ? 1 : (currentPrice < previousPrice ? -1 : 0);
+
+		// 计算当前OBV值
+		obv.push(obv[i - 1] + sign * volume);
+
+		// 更新上一个价格
+		previousPrice = currentPrice;
+	}
+
+	return obv;
+}
+
+// 使用calcEMA函数来计算MAOBV
+calcMAOBV = function (obv, n) {
+	return calcEMA(n, obv, null); // OBV是一维数组，所以field参数为null
+}
 
 /*
  * 计算DIF快线，用于MACD
@@ -482,7 +647,113 @@ calcMACD=function(short,long,mid,data,field){
     result.macd=macd;
     return result;
 };
- 
+
+/**
+ * 计算KDJ指标
+ * @param {number} n RSV计算周期，通常为9
+ * @param {number[]} high 最高价数组
+ * @param {number[]} low 最低价数组
+ * @param {number[]} close 收盘价数组
+ * @return {{K: number[], D: number[], J: number[]}} 包含K、D、J值的对象
+ */
+calcKDJ = function (n, high, low, close) {
+	var i, l, rsv, k, d, j, kPrev = 50, dPrev = 50;
+	var K = [], D = [], J = [];
+
+	// 计算RSV数组
+	var rsvArray = [];
+	for (i = 0, l = close.length; i < l; i++) {
+		if (i < n - 1) {
+			rsvArray.push(null); // 前n-1天数据不足，设为null
+			continue;
+		}
+		var highMax = Math.max(...high.slice(i - n + 1, i + 1));
+		var lowMin = Math.min(...low.slice(i - n + 1, i + 1));
+		rsv = (close[i] - lowMin) / (highMax - lowMin) * 100;
+		rsvArray.push(rsv);
+	}
+
+	// 计算K、D、J值
+	for (i = 0, l = rsvArray.length; i < l; i++) {
+		if (i === 0) {
+			K.push(50); // 初始值设为50
+			D.push(50); // 初始值设为50
+		} else {
+			k = (2 / 3) * kPrev + (1 / 3) * rsvArray[i];
+			K.push(k);
+			d = (2 / 3) * dPrev + (1 / 3) * k;
+			D.push(d);
+			kPrev = k;
+			dPrev = d;
+		}
+		j = 3 * K[i] - 2 * D[i];
+		J.push(j);
+	}
+
+	return { K: K, D: D, J: J };
+}
+
+/**
+ * 计算威廉指标WR
+ * @param {number[]} high 最高价数组
+ * @param {number[]} low 最低价数组
+ * @param {number[]} close 收盘价数组
+ * @param {number} n 时间窗口
+ * @return {array} WR数组
+ */
+calcWR = function (high, low, close, n) {
+	var i, l, range, wr, result = [];
+
+	if (high.length !== low.length || low.length !== close.length) {
+		throw new Error('数据长度不一致');
+	}
+
+	if (high.length < n) {
+		throw new Error('数据不足n个');
+	}
+
+	for (i = 0, l = high.length; i < l; i++) {
+		if (i < n - 1) {
+			result.push(null); // 数据不足n个时，WR为null
+			continue;
+		}
+
+		range = Math.max(...high.slice(i - n + 1, i + 1)) - Math.min(...low.slice(i - n + 1, i + 1));
+		wr = (close[i] - Math.max(...high.slice(i - n + 1, i + 1))) / range * 100;
+		result.push(wr.toFixed(2)); // 保留两位小数
+	}
+
+	return result;
+}
+
+/**
+ * 计算ROC指标
+ * @param {number[]} prices 股票价格数组
+ * @param {number} n 时间窗口
+ * @return {number} ROC值
+ */
+calcROC=function (prices, n) {
+	if (prices.length < n + 1) {
+		throw new Error('数据不足n+1个');
+	}
+
+	var roc = [];
+
+	for (var i = n; i < prices.length; i++) {
+		var change = (prices[i] - prices[i - n]) / prices[i - n];
+		roc.push(change);
+	}
+
+	// 如果需要，可以计算平均值、中位数、标准差等统计量
+	// 例如：
+	// var mean = calcSTD(roc, roc.length);
+
+	return roc;
+}
+
+calcMAROC = function (roc, n) {
+	return calcSMA(n, roc);
+}
  
  //=================================================MADC计算公式 end
 
