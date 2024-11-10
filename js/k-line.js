@@ -660,11 +660,17 @@ calcKDJ = function (n, high, low, close) {
 	var i, l, rsv, k, d, j, kPrev = 50, dPrev = 50;
 	var K = [], D = [], J = [];
 
+	for (i = 0, l = n-1; i < l; i++) {
+		K.push(null);
+		D.push(null);
+		J.push(null);
+	}
+
 	// 计算RSV数组
 	var rsvArray = [];
 	for (i = 0, l = close.length; i < l; i++) {
 		if (i < n - 1) {
-			rsvArray.push(null); // 前n-1天数据不足，设为null
+			// rsvArray.push(null); // 前n-1天数据不足，设为null
 			continue;
 		}
 		var highMax = Math.max(...high.slice(i - n + 1, i + 1));
@@ -760,7 +766,8 @@ calcMAROC = function (roc, n) {
 
 function initKOption(cdata, percent){
 	var data = splitData(cdata);
-	var macd=calcMACD(12,26,9,data.datas,1);  
+	var macd=calcMACD(12,26,9,data.datas,1);
+	var kdj=calcKDJ(data.datas,9,3,3);
 	return {
 			tooltip: { //弹框指示器
 				trigger: 'axis',
@@ -790,18 +797,38 @@ function initKOption(cdata, percent){
 				id: 'gd1',
 				left: '0%',
 				right: '1%',
-				height: '60%', //主K线的高度,
-				top: '5%'
+				height: '30%', //0.主K线的高度,
+				top: '1%'
 			}, {
 				left: '0%',
 				right: '1%',
-				top: '66.5%',
-				height: '10%' //交易量图的高度
+				top: '30%',
+				height: '10%' //1.交易量图的高度
 			}, {
 				left: '0%',
 				right: '1%',
-				top: '80%', //MACD 指标
-				height: '14%'
+				top: '40%', //2.MACD 指标
+				height: '10%'
+			}, {
+				left: '0%',
+				right: '1%',
+				top: '50%', //3.KDJ 指标
+				height: '10%'
+			}, {
+				left: '0%',
+				right: '1%',
+				top: '60%', //4.OBV 指标
+				height: '10%'
+			}, {
+				left: '0%',
+				right: '1%',
+				top: '70%', //5.RSI 指标
+				height: '10%'
+			}, {
+				left: '0%',
+				right: '1%',
+				top: '80%', //6.WR 指标
+				height: '10%'
 			}],
 			xAxis: [ //==== x轴
 				{ //主图
@@ -835,6 +862,34 @@ function initKOption(cdata, percent){
 				}, { //幅图
 					type: 'category',
 					gridIndex: 2,
+					data: data.times,
+					axisLabel: {
+						show: false
+					}
+				}, { //幅图
+					type: 'category',
+					gridIndex: 3,
+					data: data.times,
+					axisLabel: {
+						show: false
+					}
+				}, { //KDJ
+					type: 'category',
+					gridIndex: 4,
+					data: data.times,
+					axisLabel: {
+						show: false
+					}
+				}, { //幅图
+					type: 'category',
+					gridIndex: 5,
+					data: data.times,
+					axisLabel: {
+						show: false
+					}
+				}, { //幅图
+					type: 'category',
+					gridIndex: 6,
 					data: data.times,
 					axisLabel: {
 						show: false
@@ -885,6 +940,70 @@ function initKOption(cdata, percent){
 					axisLabel: { //label文字设置
 						color: '#c7c7c7',
 						inside: true, //label文字朝内对齐 
+						fontSize: 8
+					},
+				}, { //幅图
+					z:4, gridIndex: 3,splitNumber: 4,
+					axisLine: {
+						onZero: false
+					},
+					axisTick: {
+						show: false
+					},
+					splitLine: {
+						show: false
+					},
+					axisLabel: { //label文字设置
+						color: '#c7c7c7',
+						inside: true, //label文字朝内对齐
+						fontSize: 8
+					},
+				}, { //幅图
+					z:4, gridIndex: 4,splitNumber: 4,
+					axisLine: {
+						onZero: false
+					},
+					axisTick: {
+						show: false
+					},
+					splitLine: {
+						show: false
+					},
+					axisLabel: { //label文字设置
+						color: '#c7c7c7',
+						inside: true, //label文字朝内对齐
+						fontSize: 8
+					},
+				}, { //幅图
+					z:4, gridIndex: 5,splitNumber: 4,
+					axisLine: {
+						onZero: false
+					},
+					axisTick: {
+						show: false
+					},
+					splitLine: {
+						show: false
+					},
+					axisLabel: { //label文字设置
+						color: '#c7c7c7',
+						inside: true, //label文字朝内对齐
+						fontSize: 8
+					},
+				}, { //幅图
+					z:4, gridIndex: 6,splitNumber: 4,
+					axisLine: {
+						onZero: false
+					},
+					axisTick: {
+						show: false
+					},
+					splitLine: {
+						show: false
+					},
+					axisLabel: { //label文字设置
+						color: '#c7c7c7',
+						inside: true, //label文字朝内对齐
 						fontSize: 8
 					},
 				}
@@ -1067,6 +1186,48 @@ function initKOption(cdata, percent){
 						normal: {
 							opacity: 0.8,
 							color: '#39afe6',
+							width: 1
+						}
+					}
+				}, {
+					name: 'KDJ-K',
+					type: 'line',
+					symbol: "none",
+					xAxisIndex: 3,
+					yAxisIndex: 3,
+					data: macd.dea,
+					lineStyle: {
+						normal: {
+							opacity: 0.8,
+							color: '#000000',
+							width: 1
+						}
+					}
+				}, {
+					name: 'KDJ-D',
+					type: 'line',
+					symbol: "none",
+					xAxisIndex: 3,
+					yAxisIndex: 3,
+					data: macd.dea,
+					lineStyle: {
+						normal: {
+							opacity: 0.8,
+							color: '#f1cd1d',
+							width: 1
+						}
+					}
+				}, {
+					name: 'KDJ-J',
+					type: 'line',
+					symbol: "none",
+					xAxisIndex: 3,
+					yAxisIndex: 3,
+					data: macd.dea,
+					lineStyle: {
+						normal: {
+							opacity: 0.8,
+							color: '#9839e6',
 							width: 1
 						}
 					}
