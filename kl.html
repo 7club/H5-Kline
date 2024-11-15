@@ -5,22 +5,23 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="#B4E6FB"> 
-		<title>行情</title>  
+		<title>趋势</title>
 	</head>
 <style type="text/css">   
 	body{margin: 0;padding: 0;} 
 	.Kline-div{
 		position: fixed;width: 100%;
-		bottom: 0rem;top: 0; 
+		bottom: 0rem;top: 0;
+		display: flex;
 	}
-	/*.Kline-div .m-line{height: 19%;width: 100%;margin-bottom: 1%;}*/
-	.Kline-div .K-line{height: 100%;width: 100%;}
+	.Kline-div .m-line{height: 100%;width: 50%;}
+	.Kline-div .K-line{height: 100%;width: 50%;}
 </style>  
 	<body> 
-		<div id="Kline-div" class="Kline-div">  
-<!--				<div id="m-line" class="m-line"></div>-->
-				<div id="k-content" class="K-line"></div> 
-		</div> 
+		<div id="Kline-div" class="Kline-div">
+				<div id="m-line" class="m-line"></div>
+				<div id="k-content" class="K-line"></div>
+		</div>
 		<script src="js/jquery-3.3.1.min.js"></script>
 		<script src="js/echarts.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/tmpData.js" type="text/javascript" charset="utf-8"></script>
@@ -64,6 +65,9 @@
 
 					// var mChart = echarts.init(document.getElementById('m-line'));
 					// mChart.setOption(initMOption(data.data));
+
+					var mChart = echarts.init(document.getElementById('m-line'));
+					mChart.setOption(initKOption(data.data.kl1m));
 
 					var kChart = echarts.init(document.getElementById('k-content'));
 					kChart.setOption(initKOption(data.data.kl15));
