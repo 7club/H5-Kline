@@ -249,8 +249,7 @@ function initMOption(m_data){
 						}
 					}
 				}
-			} 
-			, { //交易图
+			}, { //交易图
 				gridIndex: 2,z:4,
 				splitNumber: 3,
 				axisLine: {
@@ -989,6 +988,8 @@ function initKOption(cdata){
 					},
 				}, { //幅图
 					z:4, gridIndex: 5,splitNumber: 4,
+					min: 'dataMin',
+					max: 'dataMax',
 					axisLine: {
 						onZero: false
 					},
@@ -1157,6 +1158,36 @@ function initKOption(cdata){
 								}
 								return colorList;
 							},
+						}
+					}
+				}, {
+					name: 'Vol-MA5',
+					type: 'line',
+					xAxisIndex: 1,
+					yAxisIndex: 1,
+					data: cdata.mavol1,
+					smooth: false,
+					symbol: "none",
+					lineStyle: {
+						normal: {
+							opacity: 0.8,
+							width: 1,
+							color: ma5Color
+						}
+					}
+				}, {
+					name: 'Vol-MA10',
+					type: 'line',
+					xAxisIndex: 1,
+					yAxisIndex: 1,
+					data: cdata.mavol2,
+					smooth: false,
+					symbol: "none",
+					lineStyle: {
+						normal: {
+							opacity: 0.8,
+							width: 1,
+							color: ma10Color
 						}
 					}
 				}, {
