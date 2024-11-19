@@ -1191,6 +1191,21 @@ function initKOption(cdata){
 						}
 					}
 				}, {
+					name: 'Vol-MA50',
+					type: 'line',
+					xAxisIndex: 1,
+					yAxisIndex: 1,
+					data: cdata.mavol3,
+					smooth: false,
+					symbol: "none",
+					lineStyle: {
+						normal: {
+							opacity: 0.8,
+							width: 1,
+							color: ma30Color
+						}
+					}
+				}, {
 					name: 'MACD',
 					type: 'bar',
 					xAxisIndex: 2,
