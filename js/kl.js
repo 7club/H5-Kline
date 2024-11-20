@@ -1365,12 +1365,12 @@ function initKOption(cdata){
 						}
 					}
 				}, {
-					name: 'RSI-3',
+					name: 'RSI-1',
 					type: 'line',
 					symbol: "none",
 					xAxisIndex: 6,
 					yAxisIndex: 6,
-					data: cdata.rsi_3,
+					data: cdata.rsi_1,
 					lineStyle: {
 						normal: {
 							opacity: 0.8,
@@ -1379,12 +1379,12 @@ function initKOption(cdata){
 						}
 					}
 				}, {
-					name: 'RSI-5',
+					name: 'RSI-2',
 					type: 'line',
 					symbol: "none",
 					xAxisIndex: 6,
 					yAxisIndex: 6,
-					data: cdata.rsi_3,
+					data: cdata.rsi_2,
 					lineStyle: {
 						normal: {
 							opacity: 0.8,
@@ -1393,7 +1393,7 @@ function initKOption(cdata){
 						}
 					}
 				}, {
-					name: 'RSI-10',
+					name: 'RSI-3',
 					type: 'line',
 					symbol: "none",
 					xAxisIndex: 6,
