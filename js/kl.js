@@ -1262,7 +1262,7 @@ function initKOption(cdata){
 					lineStyle: {
 						normal: {
 							opacity: 0.8,
-							color: '#000000',
+							color: '#2c6f91',
 							width: 1
 						}
 					}
